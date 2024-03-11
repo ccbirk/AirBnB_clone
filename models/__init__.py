@@ -1,9 +1,9 @@
 #!/usr/bin/python3
-"""
-Module: __init__.py
-"""
-from models.engine import file_storage
+""" Creation of unique FileStorage instance """
+import sys
+from .engine.file_storage import FileStorage
 
-storage = file_storage.FileStorage()
+
+sys.path.append('.')
+storage = FileStorage()
 storage.reload()
-

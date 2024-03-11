@@ -94,4 +94,5 @@ $
 All tests should also pass in non-interactive mode: $ echo "python3 -m unittest discover tests" | bash
 
 -Tasks:
-This project has 11 mandatory tasks and 7 advanced tasks.
+This project has 11 Mandatory tasks and 7 advanced tasks.
+-Team

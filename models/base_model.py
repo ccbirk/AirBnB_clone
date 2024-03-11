@@ -1,73 +1,56 @@
 #!/usr/bin/python3
-"""
-Module: base.py
-
-Handles the foundation for creating model classes with consistent
-attributes and methods.
-"""
-
-import datetime
+""" Creating: BaseModel class """
+import sys
 import uuid
+from datetime import datetime
 
-import models
+
+sys.path.append('.')
 
 
 class BaseModel:
-    """
-    Establishes a base class for defining model classes with common
-    attributes and methods.
-    """
+    """ BaseModel class core """
 
     def __init__(self, *args, **kwargs):
-        """
-        Initializes a model instance with its attributes.
-
-        Prioritizes kwargs for potential dictionary-based object creation.
-        """
+        """ Init BaseModel instance """
         if kwargs:
-            self._initialize_from_dict(kwargs)  # Refactored logic for clarity
-            return
-
-        self.id = str(uuid.uuid4())
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
-
-        models.storage.new(self)
-
-    def _initialize_from_dict(self, kwargs):
-        """
-        Initializes attributes from a provided dictionary,
-        handling date-time conversions appropriately.
-        """
-        for key, value in kwargs.items():
-            if key == '__class__':
-                continue
-            elif key in ('created_at', 'updated_at'):
-                value = datetime.fromisoformat(value)
-            setattr(self, key, value)
+            for k, v in kwargs.items():
+                if k == "created_at" or k == "updated_at":
+                    v = datetime.strptime(v, "%Y-%m-%dT%H:%M:%S.%f")
+                if k != "__class__":
+                    setattr(self, k, v)
+        else:
+            from models import storage
+            self.id = str(uuid.uuid4())
+            self.created_at = datetime.now()
+            self.updated_at = datetime.now()
+            storage.new(self)
 
     def __str__(self):
         """
-        Provides a user-friendly string representation of the model instance.
+        _str_ is a string representation
+        Return:
+            string representation of BaseModel
         """
-        return f"[{type(self).__name__}] ({self.id}) {self.__dict__}"  # Using f-strings
+        cls = self.__class__.__name__
+        formatter = "[{}] ({}) {}"
+        return (formatter.format(cls, self.id, self.__dict__))
 
     def save(self):
         """
-        Updates the 'updated_at' attribute and triggers model storage persistence.
+        Updates public attr updated_at with the current datetime
         """
+        from models import storage
         self.updated_at = datetime.now()
-        models.storage.save()
+        storage.save()
 
     def to_dict(self):
         """
-        Returns a dictionary representation of the model instance,
-        including class name and formatted date-time values.
+        Return:
+            a dict containing keys/vals of _dict_ of the instance
         """
-        model_dict = self.__dict__.copy()
-        model_dict['__class__'] = type(self).__name__
-        model_dict['created_at'] = self.created_at.isoformat()
-        model_dict['updated_at'] = self.updated_at.isoformat()
-
-        return model_dict
-
+        objDict = self.__dict__.copy()
+        objDict["__class__"] = self.__class__.__name__
+        objDict["created_at"] = self.created_at.isoformat()
+        objDict["updated_at"] = self.updated_at.isoformat()
+        return (objDict)
