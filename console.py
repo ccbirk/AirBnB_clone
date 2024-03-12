@@ -244,7 +244,7 @@ class HBNBCommand(cmd.Cmd):
             setattr(obj, argV[2], argV[3])
             obj.save()
         else:
-            print("** no instance found**")
+            print("** no instance found **")
 
 
 if __name__ == "__main__":
